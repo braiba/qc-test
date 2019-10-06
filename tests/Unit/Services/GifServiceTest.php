@@ -25,7 +25,7 @@ class GifServiceTest extends TestCase
     const DUMMY_GIF_DRIVER = 'dummy-gif-driver';
 
     /**
-     * Basic test of the 'search' method
+     * Basic test of the 'search' method (without caching)
      *
      * @covers ::search
      * @covers ::__construct
@@ -34,6 +34,8 @@ class GifServiceTest extends TestCase
      */
     public function testSearch()
     {
+        Config::set('gifs.options.cache_ttl', 0);
+
         /** @var Mock|GifProviderFactory $gifProviderFactoryMock */
         $gifProviderFactoryMock = Mockery::mock(GifProviderFactory::class);
 
@@ -64,6 +66,51 @@ class GifServiceTest extends TestCase
         $actualResult = $gifService->search(self::DUMMY_SEARCH_QUERY, self::DUMMY_GIF_PROVIDER);
 
         $this->assertSame($dummyGifData, $actualResult);
+    }
+
+    /**
+     * Check that caching works with the 'search' method
+     *
+     * @covers ::search
+     * @covers ::__construct
+     *
+     * @uses \App\Services\GifService\GifData
+     */
+    public function testSearchWithCaching()
+    {
+        Config::set('gifs.options.cache_ttl', 100);
+
+        /** @var Mock|GifProviderFactory $gifProviderFactoryMock */
+        $gifProviderFactoryMock = Mockery::mock(GifProviderFactory::class);
+
+        $gifService = new GifService($this->app, $gifProviderFactoryMock);
+
+        $dummyProviderConfig = [
+            'driver' => self::DUMMY_GIF_DRIVER,
+        ];
+        Config::set('gifs.providers.' . self::DUMMY_GIF_PROVIDER, $dummyProviderConfig);
+
+        /** @var Mock|GiphyGifDriver $gifDriverMock */
+        $gifDriverMock = Mockery::mock(GiphyGifDriver::class);
+
+        $gifProviderFactoryMock
+            ->shouldReceive('make')
+            ->once()
+            ->with(self::DUMMY_GIF_DRIVER, $dummyProviderConfig)
+            ->andReturn($gifDriverMock);
+
+        $dummyGifData = new GifData();
+
+        $gifDriverMock
+            ->shouldReceive('search')
+            ->once()
+            ->with(self::DUMMY_SEARCH_QUERY)
+            ->andReturn($dummyGifData);
+
+        $firstResult = $gifService->search(self::DUMMY_SEARCH_QUERY, self::DUMMY_GIF_PROVIDER);
+        $secondResult = $gifService->search(self::DUMMY_SEARCH_QUERY, self::DUMMY_GIF_PROVIDER);
+
+        $this->assertEquals($firstResult, $secondResult);
     }
 
     /**

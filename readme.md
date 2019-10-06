@@ -17,9 +17,6 @@ By default `GIF_PROVIDER` is set to `faker` which will cause the application to 
 If you want to use Giphy for GIF data, set `GIF_PROVIDER` to either `giphy-beta` or `giphy-production`,
 depending on the type of API key you want to use for Giphy. Then set `GIPHY_BETA_API_KEY` or `GIPHY_PRODUCTION_API_KEY` as appropriate.
 
-Set the `GIPHY_BETA_API_KEY` and `GIPHY_PRODUCTION_API_KEY` environment values in your `.env` file as appropriate.
-If you want to use the beta key, set `GIF_PROVIDER` to `giphy-beta`, otherwise leave it as `giphy-production`
-
 ## Usage
 
 ### Command line

@@ -17,4 +17,7 @@ return [
             'api_key' => env('GIPHY_PRODUCTION_API_KEY', ''),
         ],
     ],
+    'options' => [
+        'cache_ttl' => env('GIF_CACHE_TTL', 0),
+    ],
 ];

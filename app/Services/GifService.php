@@ -8,6 +8,7 @@ use App\Services\GifService\GifProviderFactory;
 use App\Services\GifService\GifDriverInterface;
 use function array_key_exists;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * A service for retrieving GIF data
@@ -31,6 +32,11 @@ class GifService
     protected $factory;
 
     /**
+     * @var int
+     */
+    protected $cacheTtl;
+
+    /**
      * @var array|GifDriverInterface[]
      */
     protected $providerMap = [];
@@ -45,6 +51,7 @@ class GifService
     {
         $this->app = $app;
         $this->factory = $factory;
+        $this->cacheTtl = config('gifs.options.cache_ttl');
     }
 
     /**
@@ -59,7 +66,22 @@ class GifService
      */
     public function search($query, $provider = null): GifData
     {
-        return $this->getProvider($provider)->search($query);
+        if ($this->cacheTtl === 0) {
+            return $this->getProvider($provider)->search($query);
+        }
+
+        $provider = ($provider ?: $this->getDefaultProvider());
+        $cacheKey = 'gifs:' . $provider . ':search:' . $query;
+
+        /** @var GifData $gifData */
+        $gifData = Cache::get($cacheKey);
+        if (!$gifData) {
+            $gifData = $this->getProvider($provider)->search($query);
+        }
+
+        Cache::put($cacheKey, $gifData, $this->cacheTtl);
+
+        return $gifData;
     }
 
     /**
