@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services\GifService;
 
+use App\Services\GifService\Drivers\FakerGifDriver;
 use App\Services\GifService\Drivers\GiphyGifDriver;
 use App\Services\GifService\GifProviderFactory;
 use InvalidArgumentException;
@@ -35,6 +36,20 @@ class GifProviderFactoryTest extends TestCase
         $actualResult = $gifProviderFactory->make('giphy', $config);
 
         $this->assertInstanceOf(GiphyGifDriver::class, $actualResult);
+    }
+
+    /**
+     * Test of the 'make' method with the faker driver
+     *
+     * @covers ::make
+     */
+    public function testMakeFaker()
+    {
+        $gifProviderFactory = new GifProviderFactory();
+
+        $actualResult = $gifProviderFactory->make('faker', []);
+
+        $this->assertInstanceOf(FakerGifDriver::class, $actualResult);
     }
 
     /**

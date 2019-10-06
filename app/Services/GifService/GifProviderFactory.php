@@ -3,6 +3,7 @@
 namespace App\Services\GifService;
 
 use App\Factories\GuzzleHttpClientFactory;
+use App\Services\GifService\Drivers\FakerGifDriver;
 use App\Services\GifService\Drivers\GiphyGifDriver;
 use InvalidArgumentException;
 
@@ -26,6 +27,9 @@ class GifProviderFactory
     public function make(string $driver, array $config): GifDriverInterface
     {
         switch ($driver) {
+            case 'faker':
+                return app(FakerGifDriver::class);
+
             case 'giphy':
                 /** @var GuzzleHttpClientFactory $httpClientFactory */
                 $httpClientFactory = app(GuzzleHttpClientFactory::class);
