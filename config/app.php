@@ -154,6 +154,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Bschmitt\Amqp\AmqpServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -176,6 +177,7 @@ return [
     'aliases' => [
 
         'App' => Illuminate\Support\Facades\App::class,
+        'Amqp' => Bschmitt\Amqp\Facades\Amqp::class,
         'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,

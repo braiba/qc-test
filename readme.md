@@ -48,3 +48,38 @@ Retrieve a random GIF:
 ```
 GET: /api/gif/random
 ```
+
+### RabbitMQ
+
+Configure your the `RABBITMQ_*` environment variables as appropriate for your connection.
+
+You will also need to set the `GIF_AMQP_EXCHANGE_NAME` and `GIF_AMQP_QUEUE_NAME`. This exchange and queue don't need to
+exist already; they will be created when you first run the service if they don't already exist.
+
+Run the AMQP GIF listener service:
+
+```
+php artisan amqp:gifs:listen
+```
+
+You can then submit requests to the exchange, using the queue name as the routing key. Making sure to include a
+`reply_to` property which dictates the routing key that the reply will be sent with (to the exchange defined by
+`GIF_AMQP_EXCHANGE_NAME`). You will need to configure a queue that is bound to this routing key in order to
+access the replies.
+
+Search for a GIF:
+
+```
+{
+    "action": "search",
+    "query": "(your search term)"
+}
+```
+
+Retrieve a random GIF:
+
+```
+{
+    "action": "random"
+}
+```
